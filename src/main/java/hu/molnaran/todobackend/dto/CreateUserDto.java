@@ -1,33 +1,25 @@
-package hu.molnaran.todobackend.model;
+package hu.molnaran.todobackend.dto;
 
+import hu.molnaran.todobackend.validation.FieldMatch;
 import org.hibernate.validator.constraints.Length;
 
-import javax.persistence.*;
 import javax.validation.constraints.*;
 
-@Entity
-public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+@FieldMatch.List({
+        @FieldMatch(fieldOne = "password", fieldTwo = "confirmPassword", message = "The password fields must match")
+})
+public class CreateUserDto {
     @Pattern(regexp = "[\\p{L}]*", message = "Name has invalid characters!")
     @NotNull(message = "Name is mandatory!")
     @NotBlank(message = "Name is mandatory!")
     private String name;
     @Email
-    @NotNull
+    @NotNull(message = "Email is mandatory!")
+    @NotBlank(message = "Email is mandatory!")
     private String email;
-    private String avatarPath;
     @Length(min = 6)
     private String password;
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
+    private String confirmPassword;
 
     public String getName() {
         return name;
@@ -53,13 +45,11 @@ public class User {
         this.password = password;
     }
 
-    public String getAvatarPath() {
-        return avatarPath;
+    public String getConfirmPassword() {
+        return confirmPassword;
     }
 
-    public void setAvatarPath(String avatarPath) {
-        this.avatarPath = avatarPath;
+    public void setConfirmPassword(String confirmPassword) {
+        this.confirmPassword = confirmPassword;
     }
-
-
 }

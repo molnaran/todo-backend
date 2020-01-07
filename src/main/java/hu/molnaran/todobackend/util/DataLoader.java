@@ -19,7 +19,7 @@ public class DataLoader implements ApplicationRunner {
         User bela= new User();
         bela.setName("Béla");
         bela.setEmail("bela@bela.hu");
-        bela.setPassword("jelszó");
+        bela.setPassword("jelszóóó");
 
         userRepository.save(bela);
 

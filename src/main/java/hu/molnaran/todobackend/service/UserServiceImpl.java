@@ -3,18 +3,20 @@ package hu.molnaran.todobackend.service;
 import hu.molnaran.todobackend.exception.AvatarNotFoundException;
 import hu.molnaran.todobackend.exception.TypeNotAllowedException;
 import hu.molnaran.todobackend.exception.UserAlreadyExistException;
-import hu.molnaran.todobackend.exception.UserNotFoundException;
+import hu.molnaran.todobackend.exception.EntityNotFoundException;
 import hu.molnaran.todobackend.model.User;
 import hu.molnaran.todobackend.repository.UserRepository;
 import hu.molnaran.todobackend.util.FileUtil;
 import org.apache.tika.Tika;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.PostConstruct;
+import javax.persistence.EntityExistsException;
 import javax.transaction.Transactional;
 import java.io.File;
 import java.io.IOException;
@@ -27,25 +29,27 @@ public class UserServiceImpl implements UserService{
     private UserRepository userRepository;
 
     @Value("${file.upload-dir}")
-    private String uploadFolder;
+    private String uploadFolderPath;
+
+    @Autowired
+    private MessageSource messageSource;
 
     private File uploadDirectory;
 
     @PostConstruct
     public void init(){
-        uploadDirectory = new File(uploadFolder);
+        uploadDirectory = new File(uploadFolderPath);
         if (!uploadDirectory.exists()){
             uploadDirectory.mkdir();
         }
     }
-
 
     @Autowired
     private FileUtil fileUtil;
 
     @Override
     public User findUserById(long id) {
-        return userRepository.findById(id).get();
+        return userRepository.findById(id).orElseThrow(() ->  new EntityNotFoundException("User not found!"));
     }
 
     @Override
@@ -60,9 +64,7 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public User createUser(User user) {
-        if (userRepository.existsById(user.getId())){
-            throw new UserAlreadyExistException();
-        }
+        userRepository.findByName(user.getName()).ifPresent(user1 -> {throw new UserAlreadyExistException();});
         return userRepository.save(user);
     }
 
@@ -73,7 +75,7 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public User removeUser(long id) {
-        User user =userRepository.findById(id).orElseThrow(() -> new UserNotFoundException());
+        User user =userRepository.findById(id).orElseThrow(EntityExistsException::new);
         fileUtil.deleteFilesFromDirectory(user.getAvatarPath(), uploadDirectory);
         userRepository.deleteById(id);
         return user;
@@ -82,7 +84,7 @@ public class UserServiceImpl implements UserService{
     @Override
     public User updateUser(long id, User user) {
         User updateToBeUpdated=userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException());
+                .orElseThrow(EntityExistsException::new);
         if (user.getEmail()!=null){
             updateToBeUpdated.setEmail(user.getEmail());
         }
@@ -97,7 +99,7 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public User addAvatar(long id, MultipartFile file) {
-        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException());
+        User user = userRepository.findById(id).orElseThrow(EntityExistsException::new);
         String fileName = user.getId()+ "_avatar";
         updateAvatarFiles(fileName, file);
         user.setAvatarPath(fileName);

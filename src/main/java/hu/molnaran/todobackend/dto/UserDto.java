@@ -6,6 +6,7 @@ public class UserDto {
     private String avatarPath;
     private String email;
     private String password;
+    private String confirmPassword;
 
     public long getId() {
         return id;
@@ -45,5 +46,13 @@ public class UserDto {
 
     public void setAvatarPath(String avatarPath) {
         this.avatarPath = avatarPath;
+    }
+
+    public String getConfirmPassword() {
+        return confirmPassword;
+    }
+
+    public void setConfirmPassword(String confirmPassword) {
+        this.confirmPassword = confirmPassword;
     }
 }

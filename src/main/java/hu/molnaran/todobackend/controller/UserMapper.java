@@ -1,5 +1,7 @@
 package hu.molnaran.todobackend.controller;
 
+import hu.molnaran.todobackend.dto.CreateUserDto;
+import hu.molnaran.todobackend.dto.PatchUserDto;
 import hu.molnaran.todobackend.dto.UserDto;
 import hu.molnaran.todobackend.model.User;
 
@@ -33,12 +35,29 @@ public class UserMapper {
         return userDto;
     }
 
+    public static User mapCreateUserDtoToUser(CreateUserDto userDto){
+        User user= new User();
+        user.setPassword(userDto.getPassword());
+        user.setName(userDto.getName());
+        user.setEmail(userDto.getEmail());
+        return user;
+    }
+
+    public static User mapPatchUserDtoToUser(PatchUserDto userDto){
+        User user= new User();
+        user.setPassword(userDto.getPassword());
+        user.setName(userDto.getName());
+        user.setEmail(userDto.getEmail());
+        return user;
+    }
+
     public static User mapUserDtoToUser(UserDto userDto){
         User user= new User();
         user.setId(userDto.getId());
         user.setPassword(userDto.getPassword());
         user.setName(userDto.getName());
         user.setEmail(userDto.getEmail());
+        user.setPassword(userDto.getPassword());
         return user;
     }
 
