@@ -4,6 +4,8 @@ import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
 import javax.validation.constraints.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class User {
@@ -20,6 +22,17 @@ public class User {
     private String avatarPath;
     @Length(min = 6)
     private String password;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
+    private List<Todo> todoList= new ArrayList<>();
+
+    public void addTodo(Todo todo){
+        this.todoList.add(todo);
+    }
+
+    public void removeTodo(Todo todo){
+        this.todoList.remove(todo);
+    }
 
     public long getId() {
         return id;
@@ -61,5 +74,23 @@ public class User {
         this.avatarPath = avatarPath;
     }
 
+    public List<Todo> getTodoList() {
+        return todoList;
+    }
 
+    @Override
+    public String toString() {
+        StringBuilder sb=new StringBuilder();
+        for (Todo t: this.todoList) {
+            sb.append(t).append("\n");
+        }
+        return "User{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", avatarPath='" + avatarPath + '\'' +
+                ", password='" + password + '\'' +
+                ", todoList=" + sb.toString() +
+                '}';
+    }
 }

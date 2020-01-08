@@ -48,4 +48,5 @@ public class PatchUserDto {
     public void setConfirmPassword(String confirmPassword) {
         this.confirmPassword = confirmPassword;
     }
+
 }

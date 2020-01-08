@@ -1,5 +1,6 @@
 package hu.molnaran.todobackend.service;
 
+import hu.molnaran.todobackend.model.Todo;
 import hu.molnaran.todobackend.model.User;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,4 +18,5 @@ public interface UserService {
     User removeUser(long id);
     User updateUser(long id, User user);
     User addAvatar(long id, MultipartFile file);
+
 }
