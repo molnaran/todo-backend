@@ -1,13 +1,22 @@
 package hu.molnaran.todobackend.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import org.hibernate.validator.constraints.Length;
 
+import javax.validation.constraints.Future;
 import java.util.Date;
 
 public class PatchTodoDto {
+
+    @Future
     private Date dueDate;
+
+    @Length(min=2, max = 50)
     private String title;
+
+    @Length(min=2, max=500)
     private String description;
+
     private Boolean done;
 
     public Date getDueDate() {

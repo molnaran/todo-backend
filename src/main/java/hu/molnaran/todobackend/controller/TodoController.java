@@ -9,6 +9,7 @@ import hu.molnaran.todobackend.service.TodoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -31,13 +32,13 @@ public class TodoController {
     }
 
     @PostMapping(value = {"/user/{userId}/todo/"})
-    public TodoDto createTodoForUser(@PathVariable(value = "userId") long userId, @RequestBody CreateTodoDto createTodoDto){
+    public TodoDto createTodoForUser(@PathVariable(value = "userId") long userId, @RequestBody @Valid CreateTodoDto createTodoDto){
         Todo todo=todoService.createTodo(userId, TodoMapper.mapCreateUserDtoToUser(createTodoDto));
         return TodoMapper.mapTodoToTodoDto(todo);
     }
 
     @PatchMapping(value = {"/todo/{todoId}"})
-    public TodoDto patchTodoForUser(@PathVariable(value = "todoId") long todoId, @RequestBody PatchTodoDto patchTodoDto){
+    public TodoDto patchTodoForUser(@PathVariable(value = "todoId") long todoId, @RequestBody @Valid  PatchTodoDto patchTodoDto){
         Todo todo=todoService.updateTodo(todoId, TodoMapper.mapPatchUserDtoToUser(patchTodoDto));
         return TodoMapper.mapTodoToTodoDto(todo);
     }

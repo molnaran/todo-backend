@@ -1,7 +1,11 @@
 package hu.molnaran.todobackend.model;
 
 
+import org.hibernate.validator.constraints.Length;
+
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 @Entity
@@ -10,14 +14,19 @@ public class Todo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @NotNull
     @Temporal(TemporalType.TIMESTAMP)
     private Date dueDate;
 
     @ManyToOne
     private User user;
 
+    @NotNull
+    @NotBlank
+    @Length(min=2, max = 50)
     private String title;
 
+    @Length(min=2, max=500)
     private String description;
 
     private Boolean done=false;
