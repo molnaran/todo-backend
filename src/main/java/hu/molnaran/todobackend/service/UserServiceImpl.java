@@ -1,9 +1,8 @@
 package hu.molnaran.todobackend.service;
 
-import hu.molnaran.todobackend.exception.AvatarNotFoundException;
+import hu.molnaran.todobackend.exception.UploadedFileNotFoundException;
 import hu.molnaran.todobackend.exception.TypeNotAllowedException;
-import hu.molnaran.todobackend.exception.UserAlreadyExistException;
-import hu.molnaran.todobackend.exception.EntityNotFoundException;
+import hu.molnaran.todobackend.exception.EmailAlreadyExistException;
 import hu.molnaran.todobackend.model.User;
 import hu.molnaran.todobackend.repository.UserRepository;
 import hu.molnaran.todobackend.util.FileUtil;
@@ -17,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.PostConstruct;
 import javax.persistence.EntityExistsException;
+import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 import java.io.File;
 import java.io.IOException;
@@ -64,7 +64,7 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public User createUser(User user) {
-        userRepository.findByName(user.getName()).ifPresent(user1 -> {throw new UserAlreadyExistException();});
+        userRepository.findByEmail(user.getEmail()).ifPresent(user1 -> {throw new EmailAlreadyExistException();});
         return userRepository.save(user);
     }
 
@@ -75,7 +75,7 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public User removeUser(long id) {
-        User user =userRepository.findById(id).orElseThrow(EntityExistsException::new);
+        User user =userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("The given user does not exist!"));
         fileUtil.deleteFilesFromDirectory(user.getAvatarPath(), uploadDirectory);
         userRepository.deleteById(id);
         return user;
@@ -86,6 +86,7 @@ public class UserServiceImpl implements UserService{
         User updateToBeUpdated=userRepository.findById(id)
                 .orElseThrow(EntityExistsException::new);
         if (user.getEmail()!=null){
+            userRepository.findByEmail(user.getEmail()).ifPresent(user1 -> {throw new EmailAlreadyExistException();});
             updateToBeUpdated.setEmail(user.getEmail());
         }
         if (user.getPassword()!=null){
@@ -110,7 +111,7 @@ public class UserServiceImpl implements UserService{
 
     private void updateAvatarFiles(String filename, MultipartFile file){
         if (file.isEmpty()){
-            throw new AvatarNotFoundException();
+            throw new UploadedFileNotFoundException();
         }
         if (!isAllowedImageType(file)){
             throw new TypeNotAllowedException();

@@ -1,21 +1,11 @@
 package hu.molnaran.todobackend.util;
 
-import hu.molnaran.todobackend.exception.AvatarNotFoundException;
+import hu.molnaran.todobackend.exception.UploadedFileNotFoundException;
 import hu.molnaran.todobackend.exception.AvatarUploadException;
-import hu.molnaran.todobackend.exception.NotAcceptableMimeTypeException;
-import hu.molnaran.todobackend.exception.TypeNotAllowedException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.tika.Tika;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StreamUtils;
 import org.springframework.web.multipart.MultipartFile;
-
-import javax.annotation.PostConstruct;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -48,11 +38,11 @@ public class FileUtil {
                 byte[] imageBytes = Files.readAllBytes(filteredFiles[0].toPath());
                 return imageBytes;
             }else{
-                throw new AvatarNotFoundException();
+                throw new UploadedFileNotFoundException();
             }
         }catch (IOException ioex){
             ioex.printStackTrace();
-            throw new AvatarNotFoundException();
+            throw new UploadedFileNotFoundException();
         }
     }
 
@@ -72,9 +62,8 @@ public class FileUtil {
                     FileUtils.deleteQuietly(fileToDelete);
                 }
             }
-
         }catch (NullPointerException npe){
-            System.out.println("Exc");
+            npe.printStackTrace();
         }
     }
 
