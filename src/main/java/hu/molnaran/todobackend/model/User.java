@@ -12,7 +12,7 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    @Pattern(regexp = "[\\p{L}]*", message = "Name has invalid characters!")
+    @Pattern(regexp = "[\\p{L} ]*", message = "Name has invalid characters!")
     @NotNull(message = "Name is mandatory!")
     @NotBlank(message = "Name is mandatory!")
     private String name;

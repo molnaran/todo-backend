@@ -4,13 +4,17 @@ import hu.molnaran.todobackend.exception.UploadedFileNotFoundException;
 import hu.molnaran.todobackend.exception.AvatarUploadException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
+
+import javax.validation.constraints.Null;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Arrays;
 
 @Component
 public class FileUtil {
@@ -25,24 +29,39 @@ public class FileUtil {
         }
     }
 
-    public byte[] getSingleFile(String startingWith, File directory){
+    public void writeResourceFile(String resourcefolder, String filename, String outputFolder) throws IOException{
+        ClassPathResource classPathResource = new ClassPathResource(resourcefolder+ "/"+filename);
+        try{
+            InputStream inputStream = classPathResource.getInputStream();
+            Path path = Paths.get(outputFolder+"/" + filename);
+            Files.copy(inputStream, path , StandardCopyOption.REPLACE_EXISTING);
+        }catch (IOException ioe){
+            ioe.printStackTrace();
+        }
+    }
+
+
+    public byte[] getSingleFile(String startingWith, File directory) throws FileNotFoundException {
         try{
             File[] filteredFiles = directory.listFiles(new FilenameFilter() {
                 @Override
                 public boolean accept(File dir, String name)
                 {
-                    return name.startsWith(startingWith + ".");
+                    return name.startsWith(startingWith);
                 }
             });
             if (filteredFiles.length>0){
                 byte[] imageBytes = Files.readAllBytes(filteredFiles[0].toPath());
                 return imageBytes;
             }else{
-                throw new UploadedFileNotFoundException();
+                throw new FileNotFoundException();
             }
         }catch (IOException ioex){
             ioex.printStackTrace();
-            throw new UploadedFileNotFoundException();
+            throw new FileNotFoundException();
+        }catch (NullPointerException ioex){
+            ioex.printStackTrace();
+            throw new FileNotFoundException();
         }
     }
 
@@ -53,7 +72,7 @@ public class FileUtil {
                 @Override
                 public boolean accept(File dir, String name)
                 {
-                    return name.startsWith(startingWith + ".");
+                    return name.startsWith(startingWith);
                 }
             });
             if (filteredFiles.length>0){

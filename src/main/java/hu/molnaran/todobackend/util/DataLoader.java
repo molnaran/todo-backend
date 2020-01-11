@@ -4,6 +4,7 @@ import hu.molnaran.todobackend.model.Todo;
 import hu.molnaran.todobackend.model.User;
 import hu.molnaran.todobackend.repository.TodoRepository;
 import hu.molnaran.todobackend.repository.UserRepository;
+import hu.molnaran.todobackend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -16,7 +17,7 @@ public class DataLoader implements ApplicationRunner {
 
 
     @Autowired
-    private UserRepository userRepository;
+    private UserService userService;
     @Autowired
     private TodoRepository todoRepository;
 
@@ -41,13 +42,13 @@ public class DataLoader implements ApplicationRunner {
         bela.addTodo(todo1);
         bela.addTodo(todo2);
 
-        userRepository.save(bela);
+        userService.createUser(bela);
 
         User zita= new User();
         zita.setName("Zita");
         zita.setEmail("zita@zita.hu");
         zita.setPassword("zitajelszó");
 
-        userRepository.save(zita);
+        userService.createUser(zita);
     }
 }

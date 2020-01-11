@@ -5,11 +5,13 @@ import hu.molnaran.todobackend.exception.TypeNotAllowedException;
 import hu.molnaran.todobackend.exception.EmailAlreadyExistException;
 import hu.molnaran.todobackend.model.User;
 import hu.molnaran.todobackend.repository.UserRepository;
+import hu.molnaran.todobackend.util.AvatarUtil;
 import hu.molnaran.todobackend.util.FileUtil;
 import org.apache.tika.Tika;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,6 +21,7 @@ import javax.persistence.EntityExistsException;
 import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 
@@ -28,24 +31,11 @@ public class UserServiceImpl implements UserService{
     @Autowired
     private UserRepository userRepository;
 
-    @Value("${file.upload-dir}")
-    private String uploadFolderPath;
 
     @Autowired
-    private MessageSource messageSource;
+    private AvatarUtil avatarUtil;
 
-    private File uploadDirectory;
 
-    @PostConstruct
-    public void init(){
-        uploadDirectory = new File(uploadFolderPath);
-        if (!uploadDirectory.exists()){
-            uploadDirectory.mkdir();
-        }
-    }
-
-    @Autowired
-    private FileUtil fileUtil;
 
     @Override
     public User findUserById(long id) {
@@ -65,18 +55,19 @@ public class UserServiceImpl implements UserService{
     @Override
     public User createUser(User user) {
         userRepository.findByEmail(user.getEmail()).ifPresent(user1 -> {throw new EmailAlreadyExistException();});
+        user.setAvatarPath(avatarUtil.getAvatarPlaceHolderName());
         return userRepository.save(user);
     }
 
     @Override
-    public byte[] getAvatar(String path) {
-        return fileUtil.getSingleFile(path, uploadDirectory);
+    public byte[] getAvatar(String avatar) {
+        return avatarUtil.getAvatar(avatar);
     }
 
     @Override
     public User removeUser(long id) {
         User user =userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("The given user does not exist!"));
-        fileUtil.deleteFilesFromDirectory(user.getAvatarPath(), uploadDirectory);
+        avatarUtil.removeAvatar(user.getAvatarPath());
         userRepository.deleteById(id);
         return user;
     }
@@ -85,8 +76,12 @@ public class UserServiceImpl implements UserService{
     public User updateUser(long id, User user) {
         User updateToBeUpdated=userRepository.findById(id)
                 .orElseThrow(EntityExistsException::new);
+
         if (user.getEmail()!=null){
-            userRepository.findByEmail(user.getEmail()).ifPresent(user1 -> {throw new EmailAlreadyExistException();});
+            userRepository.findByEmail(user.getEmail()).ifPresent(user1 -> {if (user1.getId() != id){
+                throw new EmailAlreadyExistException();
+            }
+            });
             updateToBeUpdated.setEmail(user.getEmail());
         }
         if (user.getPassword()!=null){
@@ -101,34 +96,12 @@ public class UserServiceImpl implements UserService{
     @Override
     public User addAvatar(long id, MultipartFile file) {
         User user = userRepository.findById(id).orElseThrow(EntityExistsException::new);
-        String fileName = user.getId()+ "_avatar";
-        updateAvatarFiles(fileName, file);
-        user.setAvatarPath(fileName);
+        String avatarName=avatarUtil.addAvatar(id, file);
+        user.setAvatarPath(avatarName);
         userRepository.save(user);
         return user;
     }
 
 
-    private void updateAvatarFiles(String filename, MultipartFile file){
-        if (file.isEmpty()){
-            throw new UploadedFileNotFoundException();
-        }
-        if (!isAllowedImageType(file)){
-            throw new TypeNotAllowedException();
-        }
-        fileUtil.deleteFilesFromDirectory(filename, uploadDirectory);
-        fileUtil.writeImage(filename, file, uploadDirectory);
-    }
-
-    private boolean isAllowedImageType(MultipartFile file) {
-        try{
-            Tika tika = new Tika();
-            String detectedType = tika.detect(file.getBytes());
-            return (detectedType.equals(MediaType.IMAGE_JPEG_VALUE) || detectedType.equals(MediaType.IMAGE_PNG_VALUE ));
-        }catch (IOException io){
-            io.printStackTrace();
-            throw new TypeNotAllowedException();
-        }
-    }
 
 }

@@ -18,6 +18,7 @@ import javax.persistence.EntityNotFoundException;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @RestControllerAdvice
@@ -63,10 +64,10 @@ public class ExceptionHandlerControllerAdvice extends ResponseEntityExceptionHan
             WebRequest request) {
         List<String> errors = new ArrayList<String>();
         for (FieldError error : ex.getBindingResult().getFieldErrors()) {
-            errors.add(error.getField());
+            errors.add(error.getDefaultMessage());
         }
         for (ObjectError error : ex.getBindingResult().getGlobalErrors()) {
-            errors.add(error.getObjectName() + ": " + error.getDefaultMessage());
+            errors.add(error.getObjectName());
         }
 
         ApiError apiError =
@@ -78,7 +79,7 @@ public class ExceptionHandlerControllerAdvice extends ResponseEntityExceptionHan
     @ExceptionHandler({ EntityNotFoundException.class })
     public  ResponseEntity<Object> handleEntityNotFoundException(EntityNotFoundException ex, WebRequest request){
         ApiError apiError =
-                new ApiError(HttpStatus.BAD_REQUEST, ex.getLocalizedMessage(), "Entity_Not_Found");
+                new ApiError(HttpStatus.BAD_REQUEST, ex.getLocalizedMessage(), "Entity not found!");
         return new ResponseEntity<Object>(
                 apiError, new HttpHeaders(), apiError.getStatus());
     }
@@ -88,8 +89,7 @@ public class ExceptionHandlerControllerAdvice extends ResponseEntityExceptionHan
             ConstraintViolationException ex, WebRequest request) {
         List<String> errors = new ArrayList<String>();
         for (ConstraintViolation<?> violation : ex.getConstraintViolations()) {
-            errors.add(violation.getRootBeanClass().getName() + " " +
-                    violation.getPropertyPath() + ": " + violation.getMessage());
+            errors.add(violation.getMessage());
         }
 
         ApiError apiError =

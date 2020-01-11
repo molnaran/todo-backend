@@ -9,7 +9,7 @@ import javax.validation.constraints.*;
         @FieldMatch(fieldOne = "password", fieldTwo = "confirmPassword", message = "The password fields must match")
 })
 public class PatchUserDto {
-    @Pattern(regexp = "[\\p{L}]*", message = "Name has invalid characters!")
+    @Pattern(regexp = "[\\p{L} ]*", message = "Name has invalid characters!")
     private String name;
     @Email
     private String email;

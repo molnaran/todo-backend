@@ -18,49 +18,49 @@ import java.util.List;
 
 @CrossOrigin(origins = "http://localhost:3000")
 @Validated
-@RequestMapping("/user/")
 @RestController
 public class UserController {
 
     @Autowired
     private UserService userService;
 
-    @GetMapping
+    @GetMapping(path = "user/")
     public List<UserDto> getUsers(){
         List<User> userList=userService.findUsers();
         return UserMapper.mapUsersToUserDtos(userList);
     }
 
-    @GetMapping(path = "/{userId}")
+    @GetMapping(path = "user/{userId}")
     public UserDto getUser(@PathVariable(value = "userId") long userId){
         User user=userService.findUserById(userId);
         return UserMapper.mapUserToUserDto(user);
     }
 
-    @PostMapping
+    @PostMapping("user/")
     public UserDto addUser(@RequestBody @Valid CreateUserDto userDto){
         User createdUser=userService.createUser(UserMapper.mapCreateUserDtoToUser(userDto));
         return UserMapper.mapUserToUserDto(createdUser);
     }
 
-    @PatchMapping(path = "/{userId}")
+    @PatchMapping(path = "user/{userId}")
     public UserDto updateUser(@PathVariable(value = "userId") long userId, @Valid  @RequestBody PatchUserDto userDto){
         User updatedUser = userService.updateUser(userId, UserMapper.mapPatchUserDtoToUser(userDto));
         return UserMapper.mapUserToUserDto(updatedUser);
     }
 
-    @DeleteMapping(path="/{userId}")
+    @DeleteMapping(path="user/{userId}")
     public UserDto removeUser(@PathVariable(value = "userId") long userId){
         User removedUser = userService.removeUser(userId);
         return UserMapper.mapUserToUserDto(removedUser);
     }
 
-    @PostMapping(path = "/{userId}/avatar/")
-    public User uploadToLocalFileSystem(@PathVariable(value = "userId") long userId, @RequestParam("avatar") MultipartFile avatarFile) {
-        return userService.addAvatar(userId, avatarFile);
+    @PostMapping(path = "user/{userId}/avatar/")
+    public UserDto uploadToLocalFileSystem(@PathVariable(value = "userId") long userId, @RequestParam("avatar") MultipartFile avatarFile) {
+         User user =userService.addAvatar(userId, avatarFile);
+        return UserMapper.mapUserToUserDto(user);
     }
 
-    @GetMapping(path = "/avatar/{avatarPath}", produces = {MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE})
+    @GetMapping(path = {"/avatar/{avatarPath}"}, produces = {MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE})
     public byte[] getImageWithMediaType(@PathVariable("avatarPath") String avatarPath) throws IOException {
         return userService.getAvatar(avatarPath);
     }
