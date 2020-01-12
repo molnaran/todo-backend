@@ -1,5 +1,6 @@
 package hu.molnaran.todobackend.dto;
 
+import net.minidev.json.JSONUtil;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.Future;
@@ -10,7 +11,6 @@ import java.util.Date;
 public class CreateTodoDto {
 
     @NotNull
-    @Future
     private Date dueDate;
 
     @NotNull
@@ -18,7 +18,6 @@ public class CreateTodoDto {
     @Length(min=2, max = 50)
     private String title;
 
-    @Length(min=2, max=500)
     private String description;
 
     public Date getDueDate() {
@@ -33,4 +32,12 @@ public class CreateTodoDto {
         return description;
     }
 
+    @Override
+    public String toString() {
+        return "CreateTodoDto{" +
+                "dueDate=" + dueDate +
+                ", title='" + title + '\'' +
+                ", description='" + description + '\'' +
+                '}';
+    }
 }

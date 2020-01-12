@@ -35,7 +35,7 @@ public class TodoController {
 
     @PostMapping(value = {"/user/{userId}/todo/"})
     public TodoDto createTodoForUser(@PathVariable(value = "userId") long userId, @RequestBody @Valid CreateTodoDto createTodoDto){
-        Todo todo=todoService.createTodo(userId, TodoMapper.mapCreateUserDtoToUser(createTodoDto));
+        Todo todo=todoService.createTodo(userId, TodoMapper.mapTodoDtoToTodo(createTodoDto));
         return TodoMapper.mapTodoToTodoDto(todo);
     }
 

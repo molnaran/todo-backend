@@ -26,7 +26,6 @@ public class Todo {
     @Length(min=2, max = 50)
     private String title;
 
-    @Length(min=2, max=500)
     private String description;
 
     private Boolean done=false;

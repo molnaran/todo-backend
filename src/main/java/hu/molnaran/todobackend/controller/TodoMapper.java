@@ -20,11 +20,12 @@ public class TodoMapper {
         return userDtoList;
     }
 
-    public static Todo mapCreateUserDtoToUser(CreateTodoDto createTodoDto){
+    public static Todo mapTodoDtoToTodo(CreateTodoDto createTodoDto){
         Todo todo= new Todo();
         todo.setDueDate(createTodoDto.getDueDate());
         todo.setTitle(createTodoDto.getTitle());
         todo.setDescription(createTodoDto.getDescription());
+        System.out.println(createTodoDto);
         return todo;
     }
 
