@@ -25,7 +25,6 @@ public class TodoMapper {
         todo.setDueDate(createTodoDto.getDueDate());
         todo.setTitle(createTodoDto.getTitle());
         todo.setDescription(createTodoDto.getDescription());
-        System.out.println(createTodoDto);
         return todo;
     }
 

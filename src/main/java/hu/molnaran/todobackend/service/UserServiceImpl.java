@@ -1,28 +1,16 @@
 package hu.molnaran.todobackend.service;
 
-import hu.molnaran.todobackend.exception.UploadedFileNotFoundException;
-import hu.molnaran.todobackend.exception.TypeNotAllowedException;
 import hu.molnaran.todobackend.exception.EmailAlreadyExistException;
 import hu.molnaran.todobackend.model.User;
 import hu.molnaran.todobackend.repository.UserRepository;
 import hu.molnaran.todobackend.util.AvatarUtil;
-import hu.molnaran.todobackend.util.FileUtil;
-import org.apache.tika.Tika;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.MessageSource;
-import org.springframework.core.io.ResourceLoader;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.annotation.PostConstruct;
 import javax.persistence.EntityExistsException;
 import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.List;
 
 @Transactional
